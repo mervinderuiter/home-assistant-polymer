@@ -19,12 +19,7 @@
 
       .banner {
         position: relative;
-
-        background-position: center center;
-        background-image: url(/static/images/card_media_player_bg.png);
-        background-repeat: no-repeat;
-        background-color: var(--primary-color);
-
+        background-color: white;
         border-top-left-radius: 2px;
         border-top-right-radius: 2px;
       }
@@ -36,6 +31,17 @@
         /* removed .25% from 16:9 ratio to fix YT black bars */
         padding-top: 56%;
         transition: padding-top .8s;
+      }
+
+      .banner.no-cover {
+        background-position: center center;
+        background-image: url(/static/images/card_media_player_bg.png);
+        background-repeat: no-repeat;
+        background-color: var(--primary-color);
+      }
+
+      .banner.content-type-music:before {
+        padding-top: 100%;
       }
 
       .banner.no-cover:before {
@@ -147,7 +153,7 @@
       <paper-icon-button
         icon='mdi:power'
         on-tap='handleTogglePower'
-        invisible$='[[!playerObj.supportsTurnOff]]'
+        invisible$='[[computeHidePowerButton(playerObj)]]'
         class='self-center secondary'
       ></paper-icon-button>
 
@@ -235,11 +241,15 @@ Polymer({
       cls += ' no-cover';
     }
 
+    if (playerObj.stateObj.attributes.media_content_type === 'music') {
+      cls += ' content-type-music';
+    }
+
     return cls;
   },
 
-  computeHidePowerOnButton: function (playerObj) {
-    return !playerObj.isOff || !playerObj.supportsTurnOn;
+  computeHidePowerButton: function (playerObj) {
+    return playerObj.isOff ? !playerObj.supportsTurnOn : !playerObj.supportsTurnOff;
   },
 
   computePlayerObj: function (stateObj) {
